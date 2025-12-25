@@ -45,10 +45,10 @@ export default function ReportPage(){
   const chartData = { labels, datasets:[{ label:'Skill scores (0-9)', data: values }] };
 
   return (
-    <div>
+    <div >
       <header className="mb-6">
-        <h2 className="text-2xl font-semibold">{student.name}</h2>
-        <p className="text-gray-600">Overall score: <span className="font-bold">{student.overall} / 9</span></p>
+        <h2 className="text-2xl flex items-center font-semibold">{student.name}</h2>
+        <p className="text-gray-600 flex items-center">Overall score: <span className="font-bold">{student.overall} / 9</span></p>
       </header>
 
       <div className="grid md:grid-cols-2 gap-6">

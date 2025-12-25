@@ -120,7 +120,7 @@ export default function ChartToggle({ type, onChange, chartData }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-6">
         <div>
           <label className="text-sm text-gray-600 block">Chart type</label>
           <select
@@ -171,10 +171,7 @@ export default function ChartToggle({ type, onChange, chartData }) {
           )}
         </div>
 
-        <div className="mt-4 flex items-center justify-end gap-2">
-          <button className="px-3 py-1 text-sm rounded-full bg-white border shadow-sm text-gray-600">Export</button>
-          <button className="px-3 py-1 text-sm rounded-full bg-indigo-600 text-white shadow hover:scale-105 transition">Share</button>
-        </div>
+       
       </motion.div>
     </div>
   );
