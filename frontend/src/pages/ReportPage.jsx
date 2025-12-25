@@ -36,7 +36,7 @@ export default function ReportPage(){
     <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded mx-4">
       <strong>Failed to load student:</strong> {error}
       <div className="text-sm mt-2">
-        Check backend at <code>http://localhost:4000/api/students/{id}</code>
+        Check backend at <code>https://student-report-backend-ksks.onrender.com/api/students/{id}</code>
       </div>
     </div>
   );
