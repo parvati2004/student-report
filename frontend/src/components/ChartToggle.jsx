@@ -3,8 +3,8 @@ import {
   Chart as ChartJS,
   ArcElement,
   BarElement,
-  PointElement,      // ✅ REQUIRED
-  LineElement,       // ✅ REQUIRED for radar
+  PointElement,
+  LineElement,
   CategoryScale,
   LinearScale,
   RadialLinearScale,
@@ -47,13 +47,26 @@ export default function ChartToggle({ type, onChange, chartData }) {
       ...chartData,
       datasets: (chartData.datasets || []).map((ds, idx) => {
         const base = PALETTE[idx % PALETTE.length];
-        // If user already provided colors, keep them (don't overwrite)
+
+        // --- NEW: For Bar chart, give each bar a different color ---
+        if (type === 'bar' && Array.isArray(ds.data)) {
+          const bg = ds.backgroundColor ?? ds.data.map((_, i) => PALETTE[(idx + i) % PALETTE.length]);
+          const border = ds.borderColor ?? bg;
+          return {
+            ...ds,
+            backgroundColor: bg,
+            borderColor: border,
+            borderWidth: ds.borderWidth ?? 2,
+          };
+        }
+
+        // --- Existing behavior for doughnut (per-slice) and others ---
         return {
           ...ds,
           backgroundColor: ds.backgroundColor ?? (
             Array.isArray(ds.data) && ds.data.length > 1 && type === 'doughnut'
               ? ds.data.map((_, i) => PALETTE[(idx + i) % PALETTE.length])
-              : ds.backgroundColor ?? base
+              : base
           ),
           borderColor: ds.borderColor ?? base,
           borderWidth: ds.borderWidth ?? 2,
@@ -81,17 +94,9 @@ export default function ChartToggle({ type, onChange, chartData }) {
       },
     },
     elements: {
-      arc: {
-        borderWidth: 2,
-      },
-      line: {
-        tension: 0.35,
-        borderWidth: 2,
-      },
-      point: {
-        radius: 4,
-        hoverRadius: 6,
-      },
+      arc: { borderWidth: 2 },
+      line: { tension: 0.35, borderWidth: 2 },
+      point: { radius: 4, hoverRadius: 6 },
     },
   };
 
@@ -118,6 +123,17 @@ export default function ChartToggle({ type, onChange, chartData }) {
     },
   };
 
+  // ✅ ONLY ADDITION: dynamic chart title text
+  const chartTitle =
+    type === 'bar'
+      ? 'Bar Chart'
+      : type === 'radar'
+      ? 'Radar Chart'
+      : 'Doughnut Chart';
+
+  // ✅ ONLY ADDITION: first letter to show in the circular badge
+  const chartInitial = chartTitle.charAt(0);
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-6">
@@ -134,10 +150,10 @@ export default function ChartToggle({ type, onChange, chartData }) {
           </select>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-xs text-gray-500">Preview</div>
-            <div className="text-sm font-semibold">Colorful • Responsive • Smooth</div>
+        <div className="text-right">
+          <div className="text-xs text-gray-500">Preview</div>
+          <div className="text-sm font-semibold">
+            {chartTitle}
           </div>
         </div>
       </div>
@@ -148,15 +164,14 @@ export default function ChartToggle({ type, onChange, chartData }) {
         transition={{ duration: 0.35 }}
         className="bg-gradient-to-br from-white/80 to-gray-50 p-4 rounded-2xl shadow-lg border border-gray-100"
       >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold shadow">C</div>
-            <div>
-              <div className="text-sm font-medium">Interactive Chart</div>
-              <div className="text-xs text-gray-500">Beautiful, colorful and mobile-friendly</div>
-            </div>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center text-white font-bold shadow">
+            {chartInitial}
           </div>
-          <div className="text-xs text-gray-400">Select a chart type to switch views</div>
+          <div>
+            <div className="text-sm font-medium">{chartTitle}</div>
+            <div className="text-xs text-gray-500">Score visualization</div>
+          </div>
         </div>
 
         <div className="w-full h-80 rounded-md bg-white/70 p-3">
@@ -170,8 +185,6 @@ export default function ChartToggle({ type, onChange, chartData }) {
             <Radar key="radar" data={processedChartData} options={radarOptions} />
           )}
         </div>
-
-       
       </motion.div>
     </div>
   );
